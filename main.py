@@ -27,9 +27,7 @@ def mic_check(r, microphone):
 def check_flirting(text):
     with open("key.txt") as key_file:
         key = key_file.read()
-        key = key[1:-1]
     
-
     client = OpenAI(api_key = key)
 
     completion = client.chat.completions.create(
