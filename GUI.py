@@ -1,34 +1,27 @@
 from tkinter import *
 from PIL import Image, ImageTk, ImageEnhance
-import os
-import data
-import time
+import threading
+from data import Response
 
-
-# functions
 def get_image(frame, bg, filepath, resize, transparency=1.0):
-    """returns a working image label with optional transparency"""
-    IMG = Image.open(filepath).convert("RGBA")
-    IMG = IMG.resize(resize)
-    
-    # Apply transparency
-    if transparency < 1.0:
-        alpha = IMG.split()[3]
-        alpha = ImageEnhance.Brightness(alpha).enhance(transparency)
-        IMG.putalpha(alpha)
-    
-    image = ImageTk.PhotoImage(IMG)
-    img_lbl = Label(frame, image=image, bg=bg)
-    img_lbl.image = image
-    return img_lbl
+    try:
+        IMG = Image.open(filepath).convert("RGBA")
+        IMG = IMG.resize(resize)
+        if transparency < 1.0:
+            alpha = IMG.split()[3]
+            alpha = ImageEnhance.Brightness(alpha).enhance(transparency)
+            IMG.putalpha(alpha)
+        image = ImageTk.PhotoImage(IMG)
+        img_lbl = Label(frame, image=image, bg=bg)
+        img_lbl.image = image
+        return img_lbl
+    except Exception as e:
+        print(f"Error loading image: {e}")
+        return Label(frame, text="Image not found", bg=bg, fg="red")
 
-
-# main GUI class
 class GUI:
-    """this class runs the interface"""
     def __init__(self, parent):
-        self.response = data.Response()
-
+        self.response = Response()
         self.parent = parent
         self.MED_FONT = ("Helvetica", 65, "bold")
         self.MED_FONT1 = ("Helvetica", 36)
@@ -41,79 +34,93 @@ class GUI:
         self.TINY_FONT = ("Helvetica", 12)
         self.TINY_FONT2 = ("Helvetica", 12, "underline")
 
-        # Initialize the full-screen black background
         self.main = Frame(parent, bg='black')
         self.main.pack(fill=BOTH, expand=True)
 
-        #self.on = Frame(self.main, bg='black')
-        #self.on.pack(fill=BOTH, expand=True)
+        self.on = Frame(self.main, bg='black')
+        self.on.pack(fill=BOTH, expand=True)
 
-        # Add the "Click Anywhere to Start" label
-        #self.start_prompt = Label(self.on, text="Click Anywhere to Start", fg="white", bg="black", font=self.MED_FONT1)
-        #self.start_prompt.pack(expand=True)
+        self.start_prompt = Label(self.on, text="Click Anywhere to Start", fg="white", bg="black", font=self.MED_FONT1)
+        self.start_prompt.pack(expand=True)
 
-        self.neutral = get_image(self.main, 'white', 'face_pics/Annoy_Squidward.jpg', (1200, 850))
-        self.neutral.pack(expand=True,anchor=S)
-        self.listen_prompt = Label(self.main, text="click and rizz me up...", fg="white", bg="black", font=self.MED_FONT2)
-        self.listen_prompt.pack(expand=True,anchor=N)
-
-        self.neutral.bind("<Button-1>", self.start_interface)
+        self.on.bind("<Button-1>", self.start_interface)
+        self.start_prompt.bind("<Button-1>", self.start_interface)
 
     def start_interface(self, event=None):
+        self.forget_screen(self.on)
+        self.neutral = get_image(self.main, 'white', 'face_pics/Annoy_Squidward.jpg', (1200, 850)) # <---------- might wanna change these values to fit for ashwin's screen
+        self.neutral.pack(expand=True, anchor=S)
         self.listening()
 
-
     def listening(self):
+        self.listen_prompt = Label(self.main, text="listening...", fg="white", bg="black", font=self.MED_FONT2)
+        self.listen_prompt.pack(expand=True, anchor=S)
+        threading.Thread(target=self.process_speech).start()
 
-        response = self.response.speech_to_text()
+    def process_speech(self):
+        response= self.response.speech_to_text()
+        self.update_display(response)
 
-        self.forget_screen([self.neutral,self.listen_prompt])
-
+    def update_display(self, response):
+        self.forget_screen([self.neutral, self.listen_prompt])
+        
         if response == 1:
             self.handsome()
-
         else:
             self.angry()
-            
-        self.response.text_to_speech() 
+        # Introduce a slight delay to ensure the GUI updates before playing the audio
+        #self.start_audio_thread, txt_ans
+        threading.Thread(target=self.response.text_to_speech()).start()
+
+    #def start_audio(self):
+        #threading.Thread(target=self.response.text_to_speech, args=(txt_ans,)).start()
 
     def handsome(self):
-        self.handsome_pic = get_image(self.main, 'white', 'face_pics/handsome_squidward.jpg', (1200, 850))
-        self.handsome_pic.pack(expand=True,anchor=S)
-
+        self.handsome_pic = get_image(self.main, 'white', 'face_pics/handsome_squidward.jpg', (1200, 850))# <---------- might wanna change these values to fit for ashwin's screen
+        self.handsome_pic.pack(expand=True)
+        self.thing_open = self.handsome_pic
+        self.handsome_pic.bind("<Button-1>", self.restart)
 
     def angry(self):
-        self.angry_pic = get_image(self.main, 'white', 'face_pics/angry_squidward.jpg', (1200, 850))
-        self.angry_pic.pack(expand=True,anchor=S)
+        self.angry_pic = get_image(self.main, 'white', 'face_pics/angry_squidward.jpg', (1200, 850))# <---------- might wanna change these values to fit for ashwin's screen
+        self.angry_pic.pack(expand=True)
+        self.thing_open = self.angry_pic 
+        self.angry_pic.bind("<Button-1>", self.restart)
 
+    def restart(self, event=None):
+        self.forget_screen(self.thing_open)
+        self.on = Frame(self.main, bg='black')
+        self.on.pack(fill=BOTH, expand=True)
+
+        self.start_prompt = Label(self.on, text="Click Anywhere to Start", fg="white", bg="black", font=self.MED_FONT1)
+        self.start_prompt.pack(expand=True)
+
+        self.on.bind("<Button-1>", self.start_interface)
+        self.start_prompt.bind("<Button-1>", self.start_interface)
 
     @staticmethod
     def forget_screen(widgets):
-        """forgets all the widgets on the window given the list of widgets"""
         try:
             for wid in widgets:
-                wid.pack_forget()
+                try:
+                    wid.pack_forget()
+                except:
+                    AttributeError
         except:
             widgets.pack_forget()
 
-
     @staticmethod
     def destroy_screen(widgets):
-        """destroys all the widgets on the window given the list of widgets"""
         try:
             for wid in widgets:
                 wid.destroy()
         except:
             widgets.destroy()
 
-
- 
-
-
-# mainloop
+# Main loop
 root = Tk()
 GUI(root)
 root.title("SquirtWard Face")
-root.attributes("-fullscreen", True)  # Make the window full-screen
-root.bind("<Escape>", lambda e: root.destroy())  # Pressing Escape will exit the full-screen mode
+root.attributes("-fullscreen", True)
+root.bind("<Escape>", lambda e: root.destroy())
 root.mainloop()
