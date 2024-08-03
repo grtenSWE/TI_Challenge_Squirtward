@@ -1,13 +1,22 @@
 from tkinter import *
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageEnhance
 import os
+import data
 
 
 # functions
-def get_image(frame, bg, filepath, resize):
-    """returns a working image label"""
-    IMG = Image.open(filepath)
-    image = ImageTk.PhotoImage(IMG.resize(resize))
+def get_image(frame, bg, filepath, resize, transparency=1.0):
+    """returns a working image label with optional transparency"""
+    IMG = Image.open(filepath).convert("RGBA")
+    IMG = IMG.resize(resize)
+    
+    # Apply transparency
+    if transparency < 1.0:
+        alpha = IMG.split()[3]
+        alpha = ImageEnhance.Brightness(alpha).enhance(transparency)
+        IMG.putalpha(alpha)
+    
+    image = ImageTk.PhotoImage(IMG)
     img_lbl = Label(frame, image=image, bg=bg)
     img_lbl.image = image
     return img_lbl
@@ -17,6 +26,8 @@ def get_image(frame, bg, filepath, resize):
 class GUI:
     """this class runs the interface"""
     def __init__(self, parent):
+        self.response = data.Response()
+
         self.parent = parent
         self.MED_FONT = ("Helvetica", 65, "bold")
         self.MED_FONT1 = ("Helvetica", 36)
@@ -29,24 +40,16 @@ class GUI:
         self.TINY_FONT = ("Helvetica", 12)
         self.TINY_FONT2 = ("Helvetica", 12, "underline")
 
-        self.screen = ""
-        self.current_screen = ""
-        self.current_stock_cards = []
-
         # Initialize the full-screen black background
         self.main = Frame(parent, bg='black')
         self.main.pack(fill=BOTH, expand=True)
 
-       
-
-        self.on = Frame(self.main, bg='gray')
+        self.on = Frame(self.main, bg='black')
         self.on.pack(fill=BOTH, expand=True)
 
         # Add the "Click Anywhere to Start" label
         self.start_prompt = Label(self.on, text="Click Anywhere to Start", fg="white", bg="black", font=self.MED_FONT1)
         self.start_prompt.pack(expand=True)
-
-      
 
         # Bind the click event to start the main interface
         self.on.bind("<Button-1>", self.start_interface)
@@ -55,8 +58,10 @@ class GUI:
     def start_interface(self, event=None):
         # Remove the label
         self.forget_screen(self.on)
-        bg = get_image(self.main, 'white', 'face_pics/Annoy_Squidward.jpg', (850, 850))
+        bg = get_image(self.main, 'white', 'face_pics/Annoy_Squidward.jpg', (1200, 850))
         bg.pack(expand=True,anchor=S)
+        self.face()
+
 
     @staticmethod
     def forget_screen(widgets):
@@ -77,7 +82,15 @@ class GUI:
             widgets.destroy()
 
     def face(self):
-        pass
+        self.listen_prompt = Label(self.main, text="listening...", fg="white", bg="black", font=self.MED_FONT2)
+        self.listen_prompt.pack(expand=True,anchor=S)
+        print("yes")
+        self.response.speech_to_text()
+
+
+
+        
+        
 
 
 # mainloop

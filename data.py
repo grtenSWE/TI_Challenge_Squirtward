@@ -24,7 +24,7 @@ class Response:
             response = "API unavailable"
         except sr.UnknownValueError:
             # Speech was unintelligible
-            response = "Unable to recognize speech"
+            response = "I got no rizz"
 
         print(response + "\n")
         self.__check_flirting(response) 
