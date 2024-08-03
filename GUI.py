@@ -58,9 +58,33 @@ class GUI:
     def start_interface(self, event=None):
         # Remove the label
         self.forget_screen(self.on)
-        bg = get_image(self.main, 'white', 'face_pics/Annoy_Squidward.jpg', (1200, 850))
-        bg.pack(expand=True,anchor=S)
-        self.face()
+        self.neutral = get_image(self.main, 'white', 'face_pics/Annoy_Squidward.jpg', (1200, 850))
+        self.neutral.pack(expand=True,anchor=S)
+        self.listening()
+
+
+    def listening(self):
+        self.listen_prompt = Label(self.main, text="listening...", fg="white", bg="black", font=self.MED_FONT2)
+        self.listen_prompt.pack(expand=True,anchor=S)
+        response = self.response.speech_to_text()
+
+        self.forget_screen([self.neutral,self.listen_prompt])
+
+        if response == 1:
+            self.handsome()
+
+        else:
+            self.angry()
+            
+
+    def handsome(self):
+        self.handsome_pic = get_image(self.main, 'white', 'face_pics/handsome_squidward.jpg', (1200, 850))
+        self.handsome_pic.pack(expand=True,anchor=S)
+
+
+    def angry(self):
+        self.angry_pic = get_image(self.main, 'white', 'face_pics/angry_squidward.jpg', (1200, 850))
+        self.angry_pic.pack(expand=True,anchor=S)
 
 
     @staticmethod
@@ -72,6 +96,7 @@ class GUI:
         except:
             widgets.pack_forget()
 
+
     @staticmethod
     def destroy_screen(widgets):
         """destroys all the widgets on the window given the list of widgets"""
@@ -81,16 +106,8 @@ class GUI:
         except:
             widgets.destroy()
 
-    def face(self):
-        self.listen_prompt = Label(self.main, text="listening...", fg="white", bg="black", font=self.MED_FONT2)
-        self.listen_prompt.pack(expand=True,anchor=S)
-        print("yes")
-        self.response.speech_to_text()
 
-
-
-        
-        
+ 
 
 
 # mainloop

@@ -48,6 +48,8 @@ class Response:
         print(txt_ans + "\n")
         self.__text_to_speech(txt_ans)
 
+        return bin_ans
+
 
     def __text_to_speech(self,txt_ans):
         # Ignore DeprecationWarning
