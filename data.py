@@ -50,14 +50,14 @@ class Response:
             input=self.txt_ans
         )
         response.stream_to_file("speech.mp3")
-        
+
         if self.txt_ans == 1: #<---------- calls the serialcomm function to send signal to arduino
             serialComm()
 
         playsound("speech.mp3")
         
 
-
+#function to tell the arduino to do stuff
 def serialComm():
    
     # Open serial connection to Arduino (replace 'COMS' with your actual port)
