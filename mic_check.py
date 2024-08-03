@@ -1,3 +1,5 @@
+#  Run pip install pyAudio 
+# pip install SpeechRecognition
 import speech_recognition as sr 
 
 def mic_check(r, microphone): 
