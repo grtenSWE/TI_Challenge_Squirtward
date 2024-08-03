@@ -68,8 +68,6 @@ def tts(txt_ans):
 
 
 
-
-
 if __name__ == '__main__': 
     r = sr.Recognizer()
     m = sr.Microphone()
