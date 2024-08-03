@@ -4,6 +4,9 @@ import speech_recognition as sr
 # pip install SpeechRecognition
 import warnings
 from playsound import playsound
+import serial 
+import time
+
 
 class Response:
 
@@ -71,5 +74,21 @@ class Response:
         playsound("speech.mp3")
 
 
+def serialComm():
+   
+    # Open serial connection to Arduino (replace 'COMS' with your actual port)
+    arduino = serial.Serial("COM5", 9600)
+    time.sleep(2)  # Wait for the connection to be established
+
+    TorF = input("True or False? ")
+
+    if TorF == "True":
+        print("k dewd")
+        arduino.write(b'T')
+    elif TorF == "False":
+        print("oh okay")
+        arduino.write(b'F')
+
+    arduino.close()
 
 
