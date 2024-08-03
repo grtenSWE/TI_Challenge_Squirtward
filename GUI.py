@@ -2,6 +2,7 @@ from tkinter import *
 from PIL import Image, ImageTk, ImageEnhance
 import os
 import data
+import time
 
 
 # functions
@@ -44,28 +45,26 @@ class GUI:
         self.main = Frame(parent, bg='black')
         self.main.pack(fill=BOTH, expand=True)
 
-        self.on = Frame(self.main, bg='black')
-        self.on.pack(fill=BOTH, expand=True)
+        #self.on = Frame(self.main, bg='black')
+        #self.on.pack(fill=BOTH, expand=True)
 
         # Add the "Click Anywhere to Start" label
-        self.start_prompt = Label(self.on, text="Click Anywhere to Start", fg="white", bg="black", font=self.MED_FONT1)
-        self.start_prompt.pack(expand=True)
+        #self.start_prompt = Label(self.on, text="Click Anywhere to Start", fg="white", bg="black", font=self.MED_FONT1)
+        #self.start_prompt.pack(expand=True)
 
-        # Bind the click event to start the main interface
-        self.on.bind("<Button-1>", self.start_interface)
-        self.start_prompt.bind("<Button-1>", self.start_interface)
-
-    def start_interface(self, event=None):
-        # Remove the label
-        self.forget_screen(self.on)
         self.neutral = get_image(self.main, 'white', 'face_pics/Annoy_Squidward.jpg', (1200, 850))
         self.neutral.pack(expand=True,anchor=S)
+        self.listen_prompt = Label(self.main, text="click and rizz me up...", fg="white", bg="black", font=self.MED_FONT2)
+        self.listen_prompt.pack(expand=True,anchor=N)
+
+        self.neutral.bind("<Button-1>", self.start_interface)
+
+    def start_interface(self, event=None):
         self.listening()
 
 
     def listening(self):
-        self.listen_prompt = Label(self.main, text="listening...", fg="white", bg="black", font=self.MED_FONT2)
-        self.listen_prompt.pack(expand=True,anchor=S)
+
         response = self.response.speech_to_text()
 
         self.forget_screen([self.neutral,self.listen_prompt])
@@ -76,6 +75,7 @@ class GUI:
         else:
             self.angry()
             
+        self.response.text_to_speech() 
 
     def handsome(self):
         self.handsome_pic = get_image(self.main, 'white', 'face_pics/handsome_squidward.jpg', (1200, 850))

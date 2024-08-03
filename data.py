@@ -49,12 +49,12 @@ class Response:
         bin_ans = completion.choices[0].message.content[0]
         txt_ans = completion.choices[0].message.content[1:]
         print(txt_ans + "\n")
-        self.__text_to_speech(txt_ans)
 
-        return bin_ans
+        self.txt_ans = txt_ans
+        
 
 
-    def __text_to_speech(self,txt_ans):
+    def text_to_speech(self):
         # Ignore DeprecationWarning
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -67,7 +67,7 @@ class Response:
         response = client.audio.speech.create(
         model="tts-1",
         voice="alloy",
-        input=txt_ans
+        input=self.txt_ans
         )
 
         response.stream_to_file("speech.mp3")
