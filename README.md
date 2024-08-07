@@ -3,8 +3,6 @@
 ## Overview
 
 The audio recorder captures audio input, transcribes it to text, and randomly displays either a happy or angry image based on the transcription.
-![image](https://github.com/user-attachments/assets/060bb49f-0f52-4ae1-820a-9068c25b4275)
-![image](https://github.com/user-attachments/assets/878272f8-c55a-4b2b-953d-7a6b1e2613cb)
 
 
 ## Prerequisites
